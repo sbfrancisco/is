@@ -2,6 +2,7 @@ package org.example.concrete;
 
 import org.example.interfaces.ColorCounter;
 
+import java.lang.annotation.Documented;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,11 +20,9 @@ public class Counter implements ColorCounter {
         neighbors_colors.put(color, neighbors_colors.get(color) + 1);
     }
 
-    @Override
-    public Map<String, Integer> getCounters() {
-        return neighbors_colors;
+    public int getCounterColor(String color){
+        return neighbors_colors.get(color);
     }
-
     public String getMayority() {
         Map.Entry<String, Integer> maxEntry = null;
         for (Map.Entry<String, Integer> entry : neighbors_colors.entrySet()) {

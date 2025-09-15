@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface ColorCounter {
     void incrementColor(String color);
-    Map<String,Integer> getCounters();
+    int getCounterColor(String color);
     String getMayority();
 }

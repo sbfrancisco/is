@@ -1,24 +1,24 @@
 package org.example.observers.observers;
 
-import org.example.observers.subject.CellCounter;
+import org.example.GameOfLife;
 
 public class StatusDisplay implements Observer, DisplayStats {
-    CellCounter cellCounter;
+    GameOfLife game;
     int red = 0;
     int white = 0;
     int blue = 0;
     int dead = 0;
 
-    public StatusDisplay(CellCounter cellCounter) {
-        this.cellCounter = cellCounter;
+    public StatusDisplay(GameOfLife game) {
+        this.game = game;
     }
 
     @Override
-    public void update(int count_red, int count_blue, int count_white, int count_dead, int rule_birt, int rule_, int ruleSurvive) {
-     this.red = count_red;
-     this.white = count_white;
-     this.blue = count_blue;
-     this.dead = count_dead;
+    public void update(GameOfLife game) {
+     this.red = game.getCellRed();
+     this.white = game.getCellWhite();
+     this.blue = game.getCellBlue();
+     this.dead = game.getCellDead();
      display();
     }
 

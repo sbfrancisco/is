@@ -1,57 +1,80 @@
 package org.example;
 import org.example.cells.Cell;
-import org.example.colors.Blue;
-import org.example.colors.White;
 import org.example.concrete.Counter;
 import org.example.concrete.strategy.*;
 import org.example.interfaces.ColorCounter;
-import org.example.interfaces.Rule;
 import org.example.interfaces.RuleColors;
 import org.example.interfaces.StrategyDisplay;
 import org.example.observers.observers.Observer;
 import org.example.observers.observers.StadisticDisplay;
 import org.example.observers.observers.StadisticRuleDisplay;
 import org.example.observers.observers.StatusDisplay;
-import org.example.observers.subject.CellCounter;
+import org.example.observers.subject.Subject;
 import org.example.rules.Immigration;
-import org.example.rules.StandardRule;
-import org.example.types.State;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
-import static org.example.Main.iterations;
 import static org.example.utils.Utils.initMatrix;
 
-public class GameOfLife {
-    public static int birt_cells;
-    public static int survive_cells;
-    public static int dead_cells;
-    // represent live neighbors with 1, dead with 0
+public class GameOfLife implements Subject {
+    int cell_red, cell_white, cell_blue;
+    int cell_alives;
+    int cell_dead;
+    int generations;
+    int rule_survive;
+    int rule_birt;
+    int rule_dead;
+    List<Observer> observers;
     Cell[][] matrix;
     StrategyDisplay strategyDisplay;
     RuleColors rc;
-    CellCounter counters;
+    ColorCounter counter;
     Observer stadisticRuleDisplay;
     Observer statusDisplay;
     Observer stadisticDisplay;
 
     public GameOfLife(Cell[][] matrix) {
-        counters = new CellCounter();
-        statusDisplay = new StatusDisplay(counters);
-        stadisticDisplay = new StadisticDisplay(counters, 15); // 15 is objetive of print
-        stadisticRuleDisplay = new StadisticRuleDisplay(counters,15);
-        counters.registerObserver(statusDisplay);
-        counters.registerObserver(stadisticDisplay);
-        counters.registerObserver(stadisticRuleDisplay);
         this.matrix = matrix;
+        counter = new Counter();
         initMatrix(this.matrix);
         rc = new Immigration();
+        observers = new LinkedList<>();
+        statusDisplay = new StatusDisplay(this);
+        stadisticDisplay = new StadisticDisplay(this, 15); // 15 is objetive of print
+        stadisticRuleDisplay = new StadisticRuleDisplay(this,15);
+        registerObserver(statusDisplay);
+        registerObserver(stadisticDisplay);
+        registerObserver(stadisticRuleDisplay);
         strategyDisplay = new BlackAliveWhiteDeadDisplay();
     }
 
+    public int getGenerations() { return generations; }
+
+    public int getCellAlives(){ return cell_alives; }
+
+    public int getCellDead(){ return cell_dead; }
+
+    public int getCellRed(){ return cell_red; }
+
+    public int getCellWhite(){ return cell_white; }
+
+    public int getCellBlue(){ return cell_blue; }
+
+    public int getRuleSurvive(){ return rule_survive; }
+
+    public int getRuleBirt(){ return rule_birt; }
+
+    public int getRuleDead(){ return rule_dead; }
+
+
     public void setStrategyDisplay(StrategyDisplay strategyDisplay) {
         this.strategyDisplay = strategyDisplay;
+    }
+
+    public void display() throws InterruptedException {
+        strategyDisplay.display(matrix);
     }
 
     public Cell[][] getMatrix() {
@@ -62,36 +85,69 @@ public class GameOfLife {
         int n = matrix.length;
         int m = matrix[0].length;
         Cell[][] next = new Cell[n][m];
-        ColorCounter counter = new Counter();
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                Cell c =  rc.checkRule(i, j, matrix);
-                if (!c.toString().equals("dead")) {
-                    counter.incrementColor(c.getColor());
+                Cell cell = rc.checkRule(i,j,matrix);
+                next[i][j] = cell;
+                if(cell.getState()) {
+                    cell_alives++;
+                    counter.incrementColor(cell.getColor());
+                } else {
+                    cell_dead++;
                 }
-                next[i][j] = c;
             }
         }
-        register(counter);
+        generations++;
+        getRules(matrix, next);
         matrix = next;
-    }
-    public void register(ColorCounter colorCounter) {
-        HashMap<String,Integer> cc = (HashMap<String, Integer>) colorCounter.getCounters();
-        int counter_red = cc.get("RED");
-        int counter_white = cc.get("WHITE");
-        int count_blue = cc.get("BLUE");
-        int count_dead = matrix.length *  matrix[0].length - (count_blue) - counter_white - counter_red;
-        counters.setState(counter_red, counter_white, count_blue, count_dead, birt_cells, survive_cells, dead_cells);
-        restartRules();
+        setColors();
+        notifyObservers();
     }
 
-    public void display() throws InterruptedException {
-        strategyDisplay.display(matrix);
+    public void notifyObservers(){
+        for(Observer o : observers){
+            o.update(this);
+        }
+        resetStats();
     }
 
-    public void restartRules(){
-        birt_cells = 0;
-        survive_cells = 0;
-        dead_cells = 0;
+    public void getRules(Cell[][] old_table, Cell[][] new_table) {
+        for(int i = 0; i < old_table.length; i++) {
+            for(int j = 0; j < old_table[0].length; j++) {
+                if(!old_table[i][j].getState() && new_table[i][j].getState()) {
+                    rule_birt++;
+                }
+                if(old_table[i][j].getState() && new_table[i][j].getState()) {
+                    rule_survive++;
+                }
+                if(old_table[i][j].getState() && !new_table[i][j].getState()) {
+                    rule_dead++;
+                }
+            }
+        }
     }
+
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    public void setColors(){
+        this.cell_blue = counter.getCounterColor("BLUE");
+        this.cell_red = counter.getCounterColor("RED");
+        this.cell_white = counter.getCounterColor("BLUE");
+    }
+
+    public void resetStats(){
+        this.rule_survive = 0;
+        this.rule_dead = 0;
+        this.rule_birt = 0;
+        this.cell_alives = 0;
+        this.cell_dead = 0;
+        counter = new Counter();
+    }
+
 }

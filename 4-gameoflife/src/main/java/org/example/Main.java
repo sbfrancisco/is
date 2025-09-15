@@ -23,7 +23,6 @@ public class Main {
         gol.setStrategyDisplay(new FramerDisplayColors());
 
         for(int i = 0; i < 20; i++){
-            iterations++;
             gol.display();
             gol.execute();
             System.out.println();

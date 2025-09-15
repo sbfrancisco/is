@@ -1,21 +1,12 @@
 package org.example.rules;
 
 import org.example.cells.Cell;
-import org.example.colors.Blue;
-import org.example.colors.Red;
-import org.example.colors.White;
 import org.example.concrete.Counter;
 import org.example.concrete.factory.concreteCellFactory;
 import org.example.interfaces.CellFactory;
-import org.example.interfaces.Color;
 import org.example.interfaces.ColorCounter;
 import org.example.interfaces.RuleColors;
-import org.example.observers.subject.CellCounter;
-import org.example.observers.subject.Subject;
 import org.example.types.Direction;
-import static org.example.GameOfLife.dead_cells;
-import static org.example.GameOfLife.birt_cells;
-import static org.example.GameOfLife.survive_cells;
 import java.util.*;
 
 import static org.example.utils.Utils.*;
@@ -53,26 +44,20 @@ public class Immigration implements RuleColors {
             }
         }
 
-
         if (!matrix[n][m].getState()) {
             for (Character c : neighbors) {
                 if (count_live_neighbors == Integer.parseInt(c.toString())) {
                     String color = counter.getMayority();
-                    birt_cells++;
                     return cf.createCell(color);
                 }
             }
         } else {
             for (Character c : live_neighbors) {
                 if (count_live_neighbors == Integer.parseInt(c.toString())) {
-                    survive_cells++;
                     return matrix[n][m];
                 }
             }
         }
-        dead_cells++;
         return cf.createCell("dead");
     }
-
-
 }
