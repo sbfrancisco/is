@@ -1,7 +1,7 @@
 package org.example.observers.observers;
 
-import org.example.GameOfLife;
+import org.example.StatsGameOfLife;
 
 public interface Observer {
-    void update(GameOfLife game);
+    void update(StatsGameOfLife game);
 }

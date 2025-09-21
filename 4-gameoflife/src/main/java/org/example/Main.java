@@ -24,7 +24,7 @@ public class Main {
 
         for(int i = 0; i < 20; i++){
             gol.display();
-            gol.execute();
+            gol.computeNextGeneration();
             System.out.println();
         }
     }

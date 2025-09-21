@@ -1,6 +1,7 @@
 package org.example.observers.observers;
 
 import org.example.GameOfLife;
+import org.example.StatsGameOfLife;
 
 public class StadisticDisplay implements Observer, DisplayStats {
     GameOfLife game;
@@ -16,7 +17,7 @@ public class StadisticDisplay implements Observer, DisplayStats {
     }
 
     @Override
-    public void update(GameOfLife game){
+    public void update(StatsGameOfLife game){
         this.cell_alive += game.getCellAlives();
         this.cell_dead += game.getCellDead();
         if(goal==game.getGenerations()){
