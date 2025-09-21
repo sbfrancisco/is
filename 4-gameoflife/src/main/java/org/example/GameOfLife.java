@@ -27,17 +27,28 @@ public class GameOfLife implements Subject {
 
     public GameOfLife(Cell[][] matrix) {
         this.matrix = matrix;
+        initializeGame();
+        initObservers();
+        registerObservers();
+        setStrategyDisplay(new BlackAliveWhiteDeadDisplay());
+    }
+
+    private void initializeGame(){
         stats = new StatsGameOfLife();
         initMatrix(this.matrix);
         rc = new Immigration();
+    }
+    private void initObservers(){
         observers = new LinkedList<>();
         statusDisplay = new StatusDisplay(this);
         stadisticDisplay = new StadisticDisplay(this, 15); // 15 is objetive of print
         stadisticRuleDisplay = new StadisticRuleDisplay(this,15);
+    }
+
+    private void registerObservers(){
         registerObserver(statusDisplay);
         registerObserver(stadisticDisplay);
         registerObserver(stadisticRuleDisplay);
-        strategyDisplay = new BlackAliveWhiteDeadDisplay();
     }
 
     public void setStrategyDisplay(StrategyDisplay strategyDisplay) {
