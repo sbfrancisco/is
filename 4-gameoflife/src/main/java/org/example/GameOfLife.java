@@ -1,14 +1,16 @@
 package org.example;
 import org.example.cells.Cell;
+import org.example.componentsFamily.ComponentsFamilyInterface;
 import org.example.concrete.strategy.*;
-import org.example.interfaces.RuleColors;
+import org.example.interfaces.Color;
+import org.example.interfaces.ColorCounter;
+import org.example.interfaces.Rule;
 import org.example.interfaces.StrategyDisplay;
 import org.example.observers.observers.Observer;
 import org.example.observers.observers.StadisticDisplay;
 import org.example.observers.observers.StadisticRuleDisplay;
 import org.example.observers.observers.StatusDisplay;
 import org.example.observers.subject.Subject;
-import org.example.rules.Immigration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,28 +18,36 @@ import java.util.List;
 import static org.example.utils.Utils.initMatrix;
 
 public class GameOfLife implements Subject {
+    ComponentsFamilyInterface componentsFamily;
     StatsGameOfLife stats;
+    ColorCounter counter;
     List<Observer> observers;
     Cell[][] matrix;
     StrategyDisplay strategyDisplay;
-    RuleColors rc;
+    Rule rc;
     Observer stadisticRuleDisplay;
     Observer statusDisplay;
     Observer stadisticDisplay;
 
-    public GameOfLife(Cell[][] matrix) {
-        this.matrix = matrix;
+    public GameOfLife(ComponentsFamilyInterface componentsFamily, int row, int col) {
+        this.matrix = new Cell[row][col];
+        this.componentsFamily = componentsFamily;
+        this.counter = componentsFamily.createCounter();
         initializeGame();
         initObservers();
         registerObservers();
         setStrategyDisplay(new BlackAliveWhiteDeadDisplay());
     }
+    public Color[] getColors(){
+        return componentsFamily.createColors();
+    }
 
     private void initializeGame(){
-        stats = new StatsGameOfLife();
-        initMatrix(this.matrix);
-        rc = new Immigration();
+        stats = new StatsGameOfLife(counter);
+        initMatrix(matrix);
+        rc = componentsFamily.createRule();
     }
+
     private void initObservers(){
         observers = new LinkedList<>();
         statusDisplay = new StatusDisplay(this);
@@ -75,7 +85,7 @@ public class GameOfLife implements Subject {
     }
 
     private void processCell(int row, int col, Cell[][] board) {
-        Cell cell = rc.checkRule(row, col, matrix);
+        Cell cell = rc.checkRule(row, col, this);
         board[row][col] = cell;
         stats.collectCellInfo(cell);
     }
@@ -90,7 +100,7 @@ public class GameOfLife implements Subject {
     }
 
     private void resetStatsOfGame() {
-        stats = new StatsGameOfLife();
+        stats = new StatsGameOfLife(componentsFamily.createCounter());
     }
 
     public Cell[][] getMatrix() {
@@ -110,8 +120,5 @@ public class GameOfLife implements Subject {
     public void removeObserver(Observer o) {
         observers.remove(o);
     }
-
-
-
 
 }

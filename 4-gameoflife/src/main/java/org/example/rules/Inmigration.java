@@ -1,31 +1,33 @@
 package org.example.rules;
 
+import org.example.GameOfLife;
 import org.example.cells.Cell;
 import org.example.concrete.Counter;
 import org.example.concrete.factory.concreteCellFactory;
 import org.example.interfaces.CellFactory;
 import org.example.interfaces.ColorCounter;
-import org.example.interfaces.RuleColors;
+import org.example.interfaces.Rule;
 import org.example.types.Direction;
 import java.util.*;
 
 import static org.example.utils.Utils.*;
 
-public class Immigration implements RuleColors {
+public class Inmigration implements Rule {
     String rule;
 
-    public Immigration() {
+    public Inmigration() {
         this.rule = "B3/S23";
     }
 
     @Override
-    public Cell checkRule(int n, int m, Cell[][] matrix) {
+    public Cell checkRule(int n, int m, GameOfLife game) {
         CellFactory cf = new concreteCellFactory();
         ArrayList<Set<Character>> params = parseRule(rule);
         Set<Character> neighbors = params.get(0);       // condiciones de nacimiento (B)
         Set<Character> live_neighbors = params.get(1);  // condiciones de supervivencia (S)
         int count_live_neighbors = 0;
-        ColorCounter counter = new Counter();
+        Cell[][] matrix = game.getMatrix();
+        ColorCounter counter = new Counter(game.getColors());
 
         // Recorro vecinos
         for (Direction d : Direction.getNeighbors()) {

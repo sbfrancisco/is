@@ -1,26 +1,29 @@
 package org.example;
 
 import org.example.cells.Cell;
+import org.example.concrete.factory.GameFactory;
 import org.example.concrete.factory.concreteCellFactory;
-import org.example.concrete.strategy.*;
+import org.example.concrete.factory.concreteGameGUIFactory;
 import org.example.interfaces.CellFactory;
+import org.example.interfaces.IGameFactory;
 
 public class Main {
- public static int iterations = 0;
     public static void main(String[] args) throws InterruptedException {
         CellFactory cf = new concreteCellFactory();
-        Cell[][] matrix = new Cell[5][10];
-        GameOfLife gol = new GameOfLife(matrix);
+        GameFactory gameFactory = new GameFactory();
+        String display = "GUI";
+        String game = "inmigration";
+        int row = 5;
+        int col = 8;
+        GameOfLife gol = gameFactory.createGame(display, game, row, col);
 
-        matrix[1][2] = cf.createCell("RED");
-        matrix[1][3] = cf.createCell("RED");
-        matrix[1][4] = cf.createCell("RED");
+        gol.matrix[1][2] = cf.createCell("RED");
+        gol.matrix[1][3] = cf.createCell("RED");
+        gol.matrix[1][4] = cf.createCell("RED");
 
-        matrix[3][5] = cf.createCell("BLUE");
-        matrix[4][5] = cf.createCell("BLUE");
-        matrix[2][5] = cf.createCell("BLUE");
-
-        gol.setStrategyDisplay(new FramerDisplayColors());
+        gol.matrix[3][5] = cf.createCell("BLUE");
+        gol.matrix[4][5] = cf.createCell("BLUE");
+        gol.matrix[2][5] = cf.createCell("BLUE");
 
         for(int i = 0; i < 20; i++){
             gol.display();
@@ -28,5 +31,6 @@ public class Main {
             System.out.println();
         }
     }
+
 }
 

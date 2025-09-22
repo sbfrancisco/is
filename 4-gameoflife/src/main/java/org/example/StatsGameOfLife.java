@@ -14,7 +14,7 @@ public class StatsGameOfLife {
     int rule_dead;
     ColorCounter counter;
 
-    public StatsGameOfLife(){
+    public StatsGameOfLife(ColorCounter counter) {
         cell_red = 0;
         cell_white = 0;
         cell_blue = 0;
@@ -24,7 +24,7 @@ public class StatsGameOfLife {
         rule_survive = 0;
         rule_birt = 0;
         rule_dead = 0;
-        counter = new Counter();
+        this.counter = counter;
     }
 
     public int getGenerations() { return generations; }
